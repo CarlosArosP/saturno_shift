@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saturno – Levantamiento Shift Out</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            walmart: { blue: '#0053e2', spark: '#ffc220', dark: '#003087' },
+          },
+          keyframes: {
+            'fade-in': { from: { opacity: 0, transform: 'translateY(-6px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
+            'slide-down': { from: { opacity: 0, maxHeight: '0' }, to: { opacity: 1, maxHeight: '9999px' } },
+          },
+          animation: {
+            'fade-in': 'fade-in 0.25s ease-out',
+            'slide-down': 'slide-down 0.35s ease-out',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    .accordion-body { display: none; }
+    .accordion-body.open { display: block; animation: slideDown 0.3s ease; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .chevron { transition: transform 0.3s ease; }
+    .chevron.open { transform: rotate(180deg); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #0053e2; border-radius: 3px; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans">
+
+  <!-- ══ HEADER ══════════════════════════════════════════════════════════════ -->
+  <header class="bg-walmart-blue shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+
+      <!-- Logo + título -->
+      <div class="flex items-center gap-3">
+        <!-- Walmart Spark SVG logo -->
+        <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Walmart Chile">
+          <circle cx="19" cy="19" r="19" fill="#ffc220"/>
+          <!-- Spark: 6 petals -->
+          <g fill="#0053e2">
+            <ellipse cx="19" cy="9"  rx="2.5" ry="6" />
+            <ellipse cx="19" cy="29" rx="2.5" ry="6" />
+            <ellipse cx="9"  cy="19" rx="6" ry="2.5" />
+            <ellipse cx="29" cy="19" rx="6" ry="2.5" />
+            <ellipse cx="11.5" cy="11.5" rx="2.5" ry="6" transform="rotate(-45 11.5 11.5)"/>
+            <ellipse cx="26.5" cy="26.5" rx="2.5" ry="6" transform="rotate(-45 26.5 26.5)"/>
+            <ellipse cx="26.5" cy="11.5" rx="2.5" ry="6" transform="rotate(45 26.5 11.5)"/>
+            <ellipse cx="11.5" cy="26.5" rx="2.5" ry="6" transform="rotate(45 11.5 26.5)"/>
+          </g>
+          <circle cx="19" cy="19" r="4" fill="#ffc220"/>
+        </svg>
+        <div>
+          <p class="text-white font-bold text-lg leading-tight">Walmart Chile</p>
+          <p class="text-blue-200 text-xs leading-tight">Saturno · Levantamiento Shift Out</p>
+        </div>
+      </div>
+
+      <!-- Autor -->
+      <div class="text-right hidden sm:block">
+        <p class="text-walmart-spark font-semibold text-sm">Creado por Carlos Aros</p>
+        <p class="text-blue-200 text-xs">Gerencia de Operaciones</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ HERO ════════════════════════════════════════════════════════════════ -->
+  <section class="bg-gradient-to-br from-walmart-blue via-blue-700 to-walmart-dark py-10 px-4 text-center">
+    <h1 class="text-white text-2xl md:text-3xl font-bold mb-2">📋 Registro de Turnos &amp; Consolidado</h1>
+    <p class="text-blue-200 text-sm md:text-base max-w-xl mx-auto">
+      Ingresa los datos de tu turno usando el formulario y consulta el consolidado de todos los registros.
+      Los datos quedan guardados de forma permanente y son accesibles desde cualquier tienda.
+    </p>
+  </section>
+
+  <!-- ══ MAIN CONTENT ════════════════════════════════════════════════════════ -->
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+
+    <!-- ── BANNER 1: Ingresar Datos ──────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+      <!-- Header clickeable -->
+      <button
+        onclick="toggleAccordion('form-panel', 'chevron-form')"
+        class="w-full flex items-center justify-between px-6 py-5 bg-gradient-to-r from-walmart-blue to-blue-600 text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-walmart-spark focus:ring-inset"
+        aria-expanded="false"
+        aria-controls="form-panel"
+      >
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">✍️</span>
+          <div class="text-left">
+            <p class="font-bold text-lg">Ingresar Datos de Turno</p>
+            <p class="text-blue-200 text-xs">Haz clic para abrir el formulario de registro</p>
+          </div>
+        </div>
+        <svg id="chevron-form" class="chevron w-6 h-6 text-walmart-spark flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+
+      <!-- Form body -->
+      <div id="form-panel" class="accordion-body px-6 py-6 bg-white">
+        <form
+          hx-post="/submit"
+          hx-target="#form-feedback"
+          hx-swap="outerHTML"
+          hx-on::after-request="resetFormOnSuccess(event)"
+          class="space-y-5"
+          novalidate
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+            <!-- Local -->
+            <div class="space-y-1">
+              <label for="local" class="block text-sm font-semibold text-gray-700">
+                🏪 Local <span class="text-red-500">*</span>
+              </label>
+              <select
+                id="local" name="local" required
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-800 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-walmart-blue focus:border-transparent transition"
+              >
+                <option value="" disabled selected>Selecciona una tienda…</option>
+                {% for l in locales %}
+                <option value="{{ l }}">{{ l }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- ID Colaborador -->
+            <div class="space-y-1">
+              <label for="id_colaborador" class="block text-sm font-semibold text-gray-700">
+                👤 ID Colaborador <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text" id="id_colaborador" name="id_colaborador" required
+                placeholder="Ej: 12345678"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue focus:border-transparent transition"
+              />
+            </div>
+
+            <!-- SHIFT_FUNCTION -->
+            <div class="space-y-1">
+              <label for="shift_function" class="block text-sm font-semibold text-gray-700">
+                🔧 SHIFT_FUNCTION <span class="text-red-500">*</span>
+              </label>
+              <select
+                id="shift_function" name="shift_function" required
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-800 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-walmart-blue focus:border-transparent transition"
+              >
+                <option value="" disabled selected>Selecciona función…</option>
+                {% for sf in shift_functions %}
+                <option value="{{ sf }}">{{ sf }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Semana -->
+            <div class="space-y-1">
+              <label for="semana" class="block text-sm font-semibold text-gray-700">
+                📅 Semana <span class="text-red-500">*</span>
+              </label>
+              <select
+                id="semana" name="semana" required
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-800 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-walmart-blue focus:border-transparent transition"
+              >
+                <option value="" disabled selected>Selecciona semana…</option>
+                {% for s in semanas %}
+                <option value="{{ s }}">Semana {{ s }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Fecha Turno -->
+            <div class="space-y-1">
+              <label for="fecha_turno" class="block text-sm font-semibold text-gray-700">
+                🗓️ Fecha Turno <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="date" id="fecha_turno" name="fecha_turno" required
+                min="{{ fecha_min }}" max="{{ fecha_max }}"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue focus:border-transparent transition"
+              />
+            </div>
+
+            <!-- Observación -->
+            <div class="space-y-1">
+              <label for="observacion" class="block text-sm font-semibold text-gray-700">
+                💬 Observación
+              </label>
+              <input
+                type="text" id="observacion" name="observacion"
+                placeholder="Opcional…"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue focus:border-transparent transition"
+              />
+            </div>
+
+          </div><!-- /grid -->
+
+          <!-- Feedback zone -->
+          <div id="form-feedback"></div>
+
+          <!-- Submit -->
+          <div class="flex justify-end pt-2">
+            <button
+              type="submit"
+              class="bg-walmart-blue hover:bg-blue-700 active:bg-blue-900 text-white font-bold px-8 py-3 rounded-xl shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-walmart-spark focus:ring-offset-2"
+            >
+              Guardar Registro ✅
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- ── FIN BANNER 1 ──────────────────────────────────────────────────── -->
+
+
+    <!-- ── BANNER 2: Consolidado ─────────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+      <!-- Header clickeable -->
+      <button
+        onclick="toggleAccordion('consolidado-panel', 'chevron-consolidado'); loadConsolidado();"
+        class="w-full flex items-center justify-between px-6 py-5 bg-gradient-to-r from-gray-700 to-gray-800 text-white hover:from-gray-800 hover:to-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-walmart-spark focus:ring-inset"
+        aria-expanded="false"
+        aria-controls="consolidado-panel"
+      >
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">📊</span>
+          <div class="text-left">
+            <p class="font-bold text-lg">Consolidado de Registros</p>
+            <p class="text-gray-400 text-xs">Haz clic para ver todos los turnos registrados con filtros</p>
+          </div>
+        </div>
+        <svg id="chevron-consolidado" class="chevron w-6 h-6 text-walmart-spark flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+
+      <!-- Consolidado body -->
+      <div id="consolidado-panel" class="accordion-body px-6 py-6 bg-white space-y-4">
+
+        <!-- Filtros -->
+        <form
+          id="filter-form"
+          hx-get="/consolidado"
+          hx-target="#tabla-container"
+          hx-swap="innerHTML"
+          hx-trigger="submit, change delay:400ms"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200"
+        >
+          <!-- Filtro semana -->
+          <div class="space-y-1">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Semana</label>
+            <select name="semana" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-walmart-blue">
+              <option value="">Todas</option>
+              {% for s in semanas %}
+              <option value="{{ s }}">Semana {{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Filtro local -->
+          <div class="space-y-1">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Local</label>
+            <select name="local" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-walmart-blue">
+              <option value="">Todos</option>
+              {% for l in locales %}
+              <option value="{{ l }}">{{ l }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Filtro SHIFT_FUNCTION -->
+          <div class="space-y-1">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">SHIFT_FUNCTION</label>
+            <select name="shift_function" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-walmart-blue">
+              <option value="">Todas</option>
+              {% for sf in shift_functions %}
+              <option value="{{ sf }}">{{ sf }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Filtro fecha -->
+          <div class="space-y-1">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Fecha Turno</label>
+            <input type="date" name="fecha_turno"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue" />
+          </div>
+        </form>
+
+        <!-- Botón exportar Excel -->
+        <div class="flex justify-between items-center">
+          <p class="text-xs text-gray-400">Los filtros se aplican automáticamente</p>
+          <a
+            id="export-btn"
+            href="/export"
+            class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            Descargar Excel
+          </a>
+        </div>
+
+        <!-- Tabla container -->
+        <div id="tabla-container" class="overflow-x-auto rounded-xl border border-gray-200">
+          <div class="flex items-center justify-center py-12 text-gray-400">
+            <span class="text-4xl mr-3">📂</span>
+            <span>Abre el panel para cargar los registros</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- ── FIN BANNER 2 ──────────────────────────────────────────────────── -->
+
+  </main>
+
+  <!-- ══ FOOTER ══════════════════════════════════════════════════════════════ -->
+  <footer class="mt-10 py-6 bg-walmart-blue text-center">
+    <p class="text-blue-200 text-xs">Walmart Chile &copy; 2026 · Saturno Operaciones · Creado por <span class="text-walmart-spark font-semibold">Carlos Aros</span></p>
+  </footer>
+
+  <!-- ══ SCRIPTS ═════════════════════════════════════════════════════════════ -->
+  <script>
+    // Accordion toggle
+    function toggleAccordion(panelId, chevronId) {
+      const panel = document.getElementById(panelId);
+      const chevron = document.getElementById(chevronId);
+      const isOpen = panel.classList.contains('open');
+      panel.classList.toggle('open', !isOpen);
+      chevron.classList.toggle('open', !isOpen);
+    }
+
+    // Load consolidado table when opening panel
+    let consolidadoLoaded = false;
+    function loadConsolidado() {
+      const panel = document.getElementById('consolidado-panel');
+      if (!panel.classList.contains('open') && !consolidadoLoaded) {
+        // Will open → trigger HTMX load
+        setTimeout(() => {
+          htmx.trigger('#filter-form', 'submit');
+          consolidadoLoaded = true;
+        }, 100);
+      }
+    }
+
+    // Reset form after successful submission
+    function resetFormOnSuccess(evt) {
+      if (evt.detail.successful) {
+        evt.target.reset();
+        // Refresh consolidado if open
+        const panel = document.getElementById('consolidado-panel');
+        if (panel.classList.contains('open')) {
+          htmx.trigger('#filter-form', 'submit');
+        }
+      }
+    }
+
+    // Sync export button URL with active filters
+    document.addEventListener('htmx:afterRequest', function(evt) {
+      if (evt.detail.elt && evt.detail.elt.id === 'filter-form') {
+        const form = document.getElementById('filter-form');
+        const data = new FormData(form);
+        const params = new URLSearchParams();
+        for (const [k, v] of data.entries()) {
+          if (v) params.append(k, v);
+        }
+        document.getElementById('export-btn').href = '/export?' + params.toString();
+      }
+    });
+
+    // Also update export link on filter change
+    document.getElementById('filter-form').addEventListener('change', function() {
+      const data = new FormData(this);
+      const params = new URLSearchParams();
+      for (const [k, v] of data.entries()) {
+        if (v) params.append(k, v);
+      }
+      document.getElementById('export-btn').href = '/export?' + params.toString();
+    });
+  </script>
+</body>
+</html>
