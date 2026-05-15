@@ -7,7 +7,8 @@
       <th class="px-4 py-3">ID Colaborador</th>
       <th class="px-4 py-3">SHIFT_FUNCTION</th>
       <th class="px-4 py-3">Semana</th>
-      <th class="px-4 py-3">Fecha Turno</th>
+      <th class="px-4 py-3">Fecha Inicio</th>
+      <th class="px-4 py-3">Fecha Término</th>
       <th class="px-4 py-3">Observación de la Inconsistencia</th>
       <th class="px-4 py-3">Registrado</th>
       <th class="px-4 py-3 rounded-tr-xl text-center">Acciones</th>
@@ -29,7 +30,8 @@
       <td class="px-4 py-3 text-center">
         <span class="inline-block bg-gray-100 text-gray-700 text-xs font-bold px-2 py-1 rounded">Sem {{ row['semana'] }}</span>
       </td>
-      <td class="px-4 py-3 text-gray-700">{{ row['fecha_turno'] }}</td>
+      <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ row['fecha_inicio'] or row['fecha_turno'] or '—' }}</td>
+      <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ row['fecha_termino'] or '—' }}</td>
       <td class="px-4 py-3 text-gray-500 italic max-w-xs truncate" title="{{ row['observacion'] or '' }}">{{ row['observacion'] or '—' }}</td>
       <td class="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">{{ row['created_at'] }}</td>
       <td class="px-4 py-3 text-center">

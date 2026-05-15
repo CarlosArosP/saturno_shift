@@ -179,26 +179,55 @@
               </select>
             </div>
 
-            <!-- Fecha Turno -->
+            <!-- Fecha Inicio -->
             <div class="space-y-1">
-              <label for="fecha_turno" class="block text-sm font-semibold text-gray-700">
-                🗓️ Fecha Turno <span class="text-red-500">*</span>
+              <label for="fecha_inicio" class="block text-sm font-semibold text-gray-700">
+                🗓️ Fecha Inicio <span class="text-red-500">*</span>
               </label>
               <input
-                type="date" id="fecha_turno" name="fecha_turno" required
+                type="date" id="fecha_inicio" name="fecha_inicio" required
                 min="{{ fecha_min }}" max="{{ fecha_max }}"
                 class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue focus:border-transparent transition"
               />
             </div>
 
-            <!-- Observación de la inconsistencia -->
+            <!-- Fecha Término -->
             <div class="space-y-1">
-              <label for="observacion" class="block text-sm font-semibold text-gray-700">
-                💬 Observación de la Inconsistencia
+              <label for="fecha_termino" class="block text-sm font-semibold text-gray-700">
+                🗓️ Fecha Término <span class="text-red-500">*</span>
               </label>
               <input
-                type="text" id="observacion" name="observacion"
-                placeholder="Describe la inconsistencia…"
+                type="date" id="fecha_termino" name="fecha_termino" required
+                min="{{ fecha_min }}" max="{{ fecha_max }}"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue focus:border-transparent transition"
+              />
+            </div>
+
+            <!-- Tipo de Observación -->
+            <div class="space-y-1 md:col-span-2 lg:col-span-3">
+              <label for="observacion_tipo" class="block text-sm font-semibold text-gray-700">
+                💬 Observación de la Inconsistencia <span class="text-red-500">*</span>
+              </label>
+              <select
+                id="observacion_tipo" name="observacion_tipo" required
+                onchange="toggleOtroMotivo(this.value)"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-800 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-walmart-blue focus:border-transparent transition"
+              >
+                <option value="" disabled selected>Selecciona el motivo…</option>
+                {% for tipo in observacion_tipos %}
+                <option value="{{ tipo }}">{{ tipo }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Detalle "Otro motivo" -->
+            <div id="otro-motivo-box" class="space-y-1 md:col-span-2 lg:col-span-3 hidden">
+              <label for="observacion_detalle" class="block text-sm font-semibold text-gray-700">
+                ✏️ Especifica el motivo <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text" id="observacion_detalle" name="observacion_detalle"
+                placeholder="Describe el motivo de la inconsistencia…"
                 class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue focus:border-transparent transition"
               />
             </div>
@@ -291,10 +320,17 @@
               </select>
             </div>
 
-            <!-- Filtro fecha -->
+            <!-- Filtro fecha desde -->
             <div class="space-y-1">
-              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">🗓️ Fecha Turno</label>
-              <input type="date" name="fecha_turno"
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">🗓️ Fecha Desde</label>
+              <input type="date" name="fecha_desde"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue" />
+            </div>
+
+            <!-- Filtro fecha hasta -->
+            <div class="space-y-1">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">🗓️ Fecha Hasta</label>
+              <input type="date" name="fecha_hasta"
                 class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue" />
             </div>
 
@@ -360,6 +396,15 @@
 
   <!-- ══ SCRIPTS ═════════════════════════════════════════════════════════════ -->
   <script>
+    // Mostrar/ocultar campo "Otro motivo"
+    function toggleOtroMotivo(val) {
+      const box   = document.getElementById('otro-motivo-box');
+      const input = document.getElementById('observacion_detalle');
+      const show  = val === 'Otro motivo';
+      box.classList.toggle('hidden', !show);
+      input.required = show;
+    }
+
     // Accordion toggle
     function toggleAccordion(panelId, chevronId) {
       const panel   = document.getElementById(panelId);

@@ -111,16 +111,27 @@ async def run(sql: str, args: list | None = None) -> int:
 
 
 async def init_db() -> None:
-    """Crea la tabla si no existe. Nunca destruye datos existentes."""
+    """Crea la tabla base y agrega columnas nuevas si no existen."""
     await run("""
         CREATE TABLE IF NOT EXISTS shift_out (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
-            local          TEXT    NOT NULL,
-            id_colaborador TEXT    NOT NULL,
-            shift_function TEXT    NOT NULL,
-            semana         INTEGER NOT NULL,
-            fecha_turno    TEXT    NOT NULL,
-            observacion    TEXT,
-            created_at     TEXT    DEFAULT (strftime('%Y-%m-%d %H:%M:%S','now','-4 hours'))
+            id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            local               TEXT    NOT NULL,
+            id_colaborador      TEXT    NOT NULL,
+            shift_function      TEXT    NOT NULL,
+            semana              INTEGER NOT NULL,
+            fecha_turno         TEXT,
+            observacion         TEXT,
+            created_at          TEXT DEFAULT (strftime('%Y-%m-%d %H:%M:%S','now','-4 hours'))
         )
     """)
+    # Columnas nuevas — idempotente: ignora error si ya existen
+    for col_sql in [
+        "ALTER TABLE shift_out ADD COLUMN fecha_inicio      TEXT",
+        "ALTER TABLE shift_out ADD COLUMN fecha_termino     TEXT",
+        "ALTER TABLE shift_out ADD COLUMN observacion_tipo  TEXT",
+        "ALTER TABLE shift_out ADD COLUMN observacion_detalle TEXT",
+    ]:
+        try:
+            await run(col_sql)
+        except Exception:
+            pass  # columna ya existe
