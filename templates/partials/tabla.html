@@ -8,13 +8,14 @@
       <th class="px-4 py-3">SHIFT_FUNCTION</th>
       <th class="px-4 py-3">Semana</th>
       <th class="px-4 py-3">Fecha Turno</th>
-      <th class="px-4 py-3">Observación</th>
-      <th class="px-4 py-3 rounded-tr-xl">Registrado</th>
+      <th class="px-4 py-3">Observación de la Inconsistencia</th>
+      <th class="px-4 py-3">Registrado</th>
+      <th class="px-4 py-3 rounded-tr-xl text-center">Acciones</th>
     </tr>
   </thead>
-  <tbody class="divide-y divide-gray-100">
+  <tbody class="divide-y divide-gray-100" id="tabla-body">
     {% for row in rows %}
-    <tr class="{% if loop.index is odd %}bg-white{% else %}bg-blue-50{% endif %} hover:bg-yellow-50 transition-colors duration-100">
+    <tr id="row-{{ row['id'] }}" class="{% if loop.index is odd %}bg-white{% else %}bg-blue-50{% endif %} hover:bg-yellow-50 transition-colors duration-150">
       <td class="px-4 py-3 text-gray-400 font-mono text-xs">{{ row['id'] }}</td>
       <td class="px-4 py-3 font-bold text-walmart-blue">{{ row['local'] }}</td>
       <td class="px-4 py-3 text-gray-700 font-mono">{{ row['id_colaborador'] }}</td>
@@ -29,8 +30,24 @@
         <span class="inline-block bg-gray-100 text-gray-700 text-xs font-bold px-2 py-1 rounded">Sem {{ row['semana'] }}</span>
       </td>
       <td class="px-4 py-3 text-gray-700">{{ row['fecha_turno'] }}</td>
-      <td class="px-4 py-3 text-gray-500 italic max-w-xs truncate">{{ row['observacion'] or '—' }}</td>
-      <td class="px-4 py-3 text-gray-400 text-xs">{{ row['created_at'] }}</td>
+      <td class="px-4 py-3 text-gray-500 italic max-w-xs truncate" title="{{ row['observacion'] or '' }}">{{ row['observacion'] or '—' }}</td>
+      <td class="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">{{ row['created_at'] }}</td>
+      <td class="px-4 py-3 text-center">
+        <button
+          hx-delete="/delete/{{ row['id'] }}"
+          hx-target="#row-{{ row['id'] }}"
+          hx-swap="outerHTML swap:0.3s"
+          hx-confirm="¿Eliminar este registro (#{{ row['id'] }} – Local {{ row['local'] }})? Esta acción no se puede deshacer."
+          class="inline-flex items-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-800 border border-red-200 hover:border-red-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-red-300"
+          title="Eliminar registro"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0a1 1 0 00-1-1h-4a1 1 0 00-1 1H5"/>
+          </svg>
+          Eliminar
+        </button>
+      </td>
     </tr>
     {% endfor %}
   </tbody>

@@ -143,6 +143,17 @@ async def export_excel(
     )
 
 
+# ── Delete a row ────────────────────────────────────────────────────────────
+@app.delete("/delete/{row_id}", response_class=HTMLResponse)
+async def delete_row(row_id: int) -> HTMLResponse:
+    async with aiosqlite.connect(DB_PATH) as db:
+        result = await db.execute("DELETE FROM shift_out WHERE id = ?", (row_id,))
+        await db.commit()
+    if result.rowcount == 0:
+        return HTMLResponse("", status_code=404)
+    return HTMLResponse("")   # HTMX outerHTML swap → removes the <tr>
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 async def _query_rows(
     semana: Optional[int],
