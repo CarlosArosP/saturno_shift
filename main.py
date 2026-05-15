@@ -17,7 +17,24 @@ from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+import socket
+
 from database import DB_PATH, init_db
+
+
+def _get_local_ip() -> str:
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
+
+
+SERVER_IP = _get_local_ip()
+SERVER_PORT = 8502
 
 # ── Jinja2 env (no Starlette wrapper) ────────────────────────────────────────
 TEMPLATES_DIR = Path(__file__).parent / "templates"
@@ -48,7 +65,7 @@ async def on_startup() -> None:
     await init_db()
 
 
-# ── Main page ─────────────────────────────────────────────────────────────────
+# ── Main page ───────────────────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
 async def index() -> HTMLResponse:
     html = render(
@@ -58,6 +75,9 @@ async def index() -> HTMLResponse:
         semanas=SEMANAS,
         fecha_min=FECHA_MIN,
         fecha_max=FECHA_MAX,
+        server_ip=SERVER_IP,
+        server_port=SERVER_PORT,
+        db_path=str(DB_PATH),
     )
     return HTMLResponse(html)
 

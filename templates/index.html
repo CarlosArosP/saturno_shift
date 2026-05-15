@@ -83,6 +83,45 @@
     </p>
   </section>
 
+  <!-- ══ BANNER ACCESO RED ═══════════════════════════════════════════════════ -->
+  <div class="max-w-6xl mx-auto px-4 pt-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+      <div class="flex items-center gap-2 text-walmart-blue flex-shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+        </svg>
+        <span class="font-bold text-sm">Link de acceso desde cualquier tienda:</span>
+      </div>
+      <div class="flex-1 flex flex-wrap items-center gap-2">
+        <code class="bg-white border border-blue-300 text-walmart-blue font-mono font-bold text-sm px-3 py-1.5 rounded-lg select-all">
+          http://{{ server_ip }}:{{ server_port }}
+        </code>
+        <button
+          onclick="copyLink()"
+          class="inline-flex items-center gap-1 bg-walmart-blue hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+          </svg>
+          <span id="copy-label">Copiar</span>
+        </button>
+        <span class="text-xs text-blue-600">⚠️ Dispositivos deben estar en la <strong>red Walmart / VPN</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function copyLink() {
+      navigator.clipboard.writeText('http://{{ server_ip }}:{{ server_port }}').then(() => {
+        const lbl = document.getElementById('copy-label');
+        lbl.textContent = '¡Copiado!';
+        setTimeout(() => lbl.textContent = 'Copiar', 2000);
+      });
+    }
+  </script>
+
   <!-- ══ MAIN CONTENT ════════════════════════════════════════════════════════ -->
   <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
 

@@ -1,0 +1,23 @@
+# Entorno virtual
+.venv/
+
+# Base de datos local (los datos viven en AppData, no en el repo)
+*.db
+*.db-shm
+*.db-wal
+
+# Logs de servidor
+*.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos temporales de test
+test_response.html
+test2.html
+cons*.html
+
+# Variables de entorno
+.env
