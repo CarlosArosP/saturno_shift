@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: saturno-shift
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: TURSO_URL
+        sync: false          # lo ingresas a mano en el dashboard de Render
+      - key: TURSO_AUTH_TOKEN
+        sync: false

@@ -1,12 +1,15 @@
 # Entorno virtual
 .venv/
 
-# Base de datos local (los datos viven en AppData, no en el repo)
+# Base de datos local
 *.db
 *.db-shm
 *.db-wal
 
-# Logs de servidor
+# Credenciales — NUNCA al repo
+.env
+
+# Logs
 *.log
 
 # Python cache
@@ -18,6 +21,5 @@ __pycache__/
 test_response.html
 test2.html
 cons*.html
-
-# Variables de entorno
-.env
+pg.html
+c.html

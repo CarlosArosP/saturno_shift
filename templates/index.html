@@ -83,7 +83,7 @@
     </p>
   </section>
 
-  <!-- ══ BANNER ACCESO RED ═══════════════════════════════════════════════════ -->
+  <!-- ══ BANNER ACCESO ══════════════════════════════════════════════════════ -->
   <div class="max-w-6xl mx-auto px-4 pt-6">
     <div class="bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
       <div class="flex items-center gap-2 text-walmart-blue flex-shrink-0">
@@ -91,12 +91,10 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
         </svg>
-        <span class="font-bold text-sm">Link de acceso desde cualquier tienda:</span>
+        <span class="font-bold text-sm">Comparte este link con cualquier tienda:</span>
       </div>
       <div class="flex-1 flex flex-wrap items-center gap-2">
-        <code class="bg-white border border-blue-300 text-walmart-blue font-mono font-bold text-sm px-3 py-1.5 rounded-lg select-all">
-          http://{{ server_ip }}:{{ server_port }}
-        </code>
+        <code id="app-url" class="bg-white border border-blue-300 text-walmart-blue font-mono font-bold text-sm px-3 py-1.5 rounded-lg select-all"></code>
         <button
           onclick="copyLink()"
           class="inline-flex items-center gap-1 bg-walmart-blue hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition"
@@ -107,20 +105,10 @@
           </svg>
           <span id="copy-label">Copiar</span>
         </button>
-        <span class="text-xs text-blue-600">⚠️ Dispositivos deben estar en la <strong>red Walmart / VPN</strong></span>
+        <span class="text-xs text-green-700 font-medium">🌐 Accesible desde cualquier dispositivo con internet</span>
       </div>
     </div>
   </div>
-
-  <script>
-    function copyLink() {
-      navigator.clipboard.writeText('http://{{ server_ip }}:{{ server_port }}').then(() => {
-        const lbl = document.getElementById('copy-label');
-        lbl.textContent = '¡Copiado!';
-        setTimeout(() => lbl.textContent = 'Copiar', 2000);
-      });
-    }
-  </script>
 
   <!-- ══ MAIN CONTENT ════════════════════════════════════════════════════════ -->
   <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
@@ -399,9 +387,19 @@
 
   <!-- ══ SCRIPTS ═════════════════════════════════════════════════════════════ -->
   <script>
+    // Link dinámico (funciona local y en Render)
+    const appUrl = window.location.origin;
+    document.getElementById('app-url').textContent = appUrl;
+
+    function copyLink() {
+      navigator.clipboard.writeText(appUrl).then(() => {
+        const lbl = document.getElementById('copy-label');
+        lbl.textContent = '¡Copiado!';
+        setTimeout(() => lbl.textContent = 'Copiar', 2000);
+      });
+    }
+
     // Accordion toggle
-    function toggleAccordion(panelId, chevronId) {
-      const panel = document.getElementById(panelId);
       const chevron = document.getElementById(chevronId);
       const isOpen = panel.classList.contains('open');
       panel.classList.toggle('open', !isOpen);
